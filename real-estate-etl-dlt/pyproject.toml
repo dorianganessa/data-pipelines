@@ -1,0 +1,15 @@
+[project]
+name = "real-estate-etl-dlt"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "dlt[duckdb]>=1.5.0",
+    "numpy>=2.2.2",
+    "pandas>=2.2.3",
+    "scrapy>=2.12.0",
+]
+
+[tool.uv.workspace]
+members = ["real-estate-etl-dlt"]

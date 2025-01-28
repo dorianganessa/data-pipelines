@@ -1,0 +1,13 @@
+[project]
+name = "data-pipelines"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "beautifulsoup4>=4.12.3",
+    "requests>=2.32.3",
+]
+
+[tool.uv.workspace]
+members = ["real-estate-etl"]

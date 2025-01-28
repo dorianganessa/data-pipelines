@@ -1,0 +1,10 @@
+# put your configuration values here
+
+[runtime]
+log_level="WARNING"  # the system log level of dlt
+# use the dlthub_telemetry setting to enable/disable anonymous usage data reporting, see https://dlthub.com/docs/reference/telemetry
+dlthub_telemetry = false
+
+[sources.scraping]
+start_urls = ["https://www.immobiliare.it/vendita-case/napoli/con-garage/?criterio=data&ordine=desc&prezzoMinimo=340000&prezzoMassimo=700000&superficieMinima=100&boxAuto[]=3&boxAuto[]=4&boxAuto[]=1&tipoProprieta=1&fasciaPiano[]=30&fasciaPiano[]=20"] # please set me up!
+start_urls_file = "start_urls_file" # please set me up!
