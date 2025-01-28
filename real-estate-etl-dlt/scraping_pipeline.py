@@ -9,7 +9,6 @@ from scrapy.http import Response  # type: ignore
 from scraping import run_pipeline
 from scraping.helpers import create_pipeline_runner
 
-
 class PropertySpider(Spider):
     def parse(self, response: Response, **kwargs: Any) -> Any:
          # Extract links based on the rules
@@ -77,11 +76,62 @@ def scrape_properties() -> None:
         write_disposition="append",
     )
 
+def clean_properties() -> None:
+    create_table_query = """
+CREATE TABLE IF NOT EXISTS properties.cleaned_properties (
+    url TEXT PRIMARY KEY,
+    title TEXT,
+    content TEXT,
+    price INTEGER,
+    city TEXT,
+    neighbourhood TEXT,
+    road TEXT,
+    square_meters INTEGER,
+    floor TEXT
+);
+CREATE OR REPLACE TABLE properties.new_properties (
+    url TEXT PRIMARY KEY,
+    title TEXT,
+    content TEXT,
+    price INTEGER,
+    city TEXT,
+    neighbourhood TEXT,
+    road TEXT,
+    square_meters INTEGER,
+    floor TEXT
+);
+"""
+    con = duckdb.connect("../scraping.duckdb")
+    con.sql(create_table_query)
+
+    insert_query = """
+INSERT INTO properties.cleaned_properties (url, title, price, city, neighbourhood, road, square_meters, floor)
+SELECT url, title, price, city, neighbourhood, road, square_meters, floor
+FROM properties.properties
+WHERE NOT EXISTS (  
+    SELECT 1 
+    FROM properties.cleaned_properties
+    WHERE properties.cleaned_properties.url = properties.properties.url
+);
+"""
+
+    insert_query_only_new = """
+INSERT INTO properties.new_properties (url, title, price, city, neighbourhood, road, square_meters, floor)
+SELECT url, title, price, city, neighbourhood, road, square_meters, floor
+FROM properties.properties
+WHERE NOT EXISTS (  
+    SELECT 1 
+    FROM properties.cleaned_properties
+    WHERE properties.cleaned_properties.url = properties.properties.url
+)
+"""
+    con.sql(insert_query_only_new)
+    con.sql(insert_query)
+ 
+    con.sql("DELETE FROM properties.properties;")
 
 
 if __name__ == "__main__":
     scrape_properties()
-
-    con = duckdb.connect("../scraping.duckdb")
-    print(con.sql("select * from properties.properties;"))
-
+    clean_properties()
+    
