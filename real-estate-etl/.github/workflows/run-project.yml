@@ -1,0 +1,38 @@
+name: Run Python Project with UV
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  run-python:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install UV
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Set up Python Environment with UV
+        run: uv venv .venv
+
+      - name: Install Dependencies
+        run: uv lock
+
+      - name: Create .env File
+        run: |
+          echo "warehouse_name=${{ secrets.warehouse_name }}" > .env
+          echo "motherduck_token=${{ secrets.motherduck_token }}" >> .env
+          echo "scrape_url=${{ secrets.scrape_url }}" >> .env
+      - name: Run Python Script
+        env:
+          warehouse_name: ${{ secrets.warehouse_name }}
+          motherduck_token: ${{ secrets.motherduck_token }}
+          scrape_url: ${{ secrets.scrape_url }}
+        run: uv run scan_properties.py

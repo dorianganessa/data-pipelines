@@ -1,42 +1,42 @@
+import logging
 from typing import Any
 import re
 import dlt
 import duckdb
 from dlt.sources import DltResource
+
 from scrapy import Spider  # type: ignore
 from scrapy.http import Response  # type: ignore
 
 from scraping import run_pipeline
 from scraping.helpers import create_pipeline_runner
 
-class PropertySpider(Spider):
-    def parse(self, response: Response, **kwargs: Any) -> Any:
-         # Extract links based on the rules
-        links = response.css('a.in-listingCardTitle::attr(href)').getall()
+# Configure logging to display debug messages
+logging.basicConfig(level=logging.ERROR)
 
-        # Yield the links as data
+class PropertySpider(Spider):
+    name = "property_spider"  # Ensure the spider has a name
+
+    def parse(self, response: Response, **kwargs: Any) -> Any:
+        logging.debug("Parsing response from: %s", response.url)
+        links = response.css('a.in-listingCardTitle::attr(href)').getall()
         for link in links:
             absolute_url = response.urljoin(link)
-            # Follow the link to scrape its content
+            logging.debug("Following link: %s", absolute_url)
             yield response.follow(absolute_url, callback=self.parse_page)
 
     def parse_page(self, response):
-        # Customize the rules to scrape the page's content
+        logging.debug("Parsing page: %s", response.url)
         for listing in response.css('section.re-layoutContentCenter'):
-            # Use more specific and robust selectors
             city = listing.css('div.re-title__content span.re-blockTitle__location::text').get()
             neighbourhood = listing.css('div.re-title__content span.re-blockTitle__location:nth-of-type(2)::text').get()
             road = listing.css('div.re-title__content span.re-blockTitle__location:nth-of-type(3)::text').get()
             price_raw = listing.css('div.re-overview__price span::text').get()
             price = self.parse_price(price_raw)
-            # Extract square meters
             square_meters_raw = listing.css('div.re-mainFeatures__item svg[viewBox="0 0 24 24"] + span::text').re_first(r'(\d+)\s?m²')
             square_meters = int(square_meters_raw) if square_meters_raw else None
-
-            # Extract floor information
             floor = listing.css('div.re-mainFeatures__item svg[viewBox="0 0 24 24"] + span::text').re_first(r'Piano\s(.+)')
             floor = floor.strip() if floor else None
-
 
             yield {
                 "url": response.url,
@@ -49,36 +49,36 @@ class PropertySpider(Spider):
                 "square_meters": square_meters,
                 "floor": floor,
             }
-        
+
     @staticmethod
     def parse_price(price_raw):
         if not price_raw:
             return None
-        # Remove any non-numeric characters (except the decimal separator)
         price_cleaned = re.sub(r'[^\d]', '', price_raw)
         return int(price_cleaned) if price_cleaned else None
 
-
 def scrape_properties() -> None:
+    logging.debug("Starting property scraping")
     pipeline = dlt.pipeline(
-        pipeline_name="scraping",
-        destination="duckdb",
-        dataset_name="properties",
+        pipeline_name='main',
+        destination='motherduck',
+        dataset_name='main',
     )
 
     run_pipeline(
         pipeline,
         PropertySpider,
-        # you can pass scrapy settings overrides here
         scrapy_settings={
             "DEPTH_LIMIT": 1,
         },
         write_disposition="append",
     )
+    logging.debug("Finished property scraping")
 
-def clean_properties() -> None:
+def clean_properties(con) -> None:
+    logging.debug("Starting property cleaning")
     create_table_query = """
-CREATE TABLE IF NOT EXISTS properties.cleaned_properties (
+CREATE TABLE IF NOT EXISTS main.cleaned_properties (
     url TEXT PRIMARY KEY,
     title TEXT,
     content TEXT,
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS properties.cleaned_properties (
     square_meters INTEGER,
     floor TEXT
 );
-CREATE OR REPLACE TABLE properties.new_properties (
+CREATE OR REPLACE TABLE main.new_properties (
     url TEXT PRIMARY KEY,
     title TEXT,
     content TEXT,
@@ -101,37 +101,40 @@ CREATE OR REPLACE TABLE properties.new_properties (
     floor TEXT
 );
 """
-    con = duckdb.connect("../scraping.duckdb")
     con.sql(create_table_query)
-
     insert_query = """
-INSERT INTO properties.cleaned_properties (url, title, price, city, neighbourhood, road, square_meters, floor)
+INSERT INTO main.cleaned_properties (url, title, price, city, neighbourhood, road, square_meters, floor)
 SELECT url, title, price, city, neighbourhood, road, square_meters, floor
-FROM properties.properties
+FROM main.properties
 WHERE NOT EXISTS (  
     SELECT 1 
-    FROM properties.cleaned_properties
-    WHERE properties.cleaned_properties.url = properties.properties.url
+    FROM main.cleaned_properties
+    WHERE main.cleaned_properties.url = main.properties.url
 );
 """
-
     insert_query_only_new = """
-INSERT INTO properties.new_properties (url, title, price, city, neighbourhood, road, square_meters, floor)
+INSERT INTO main.new_properties (url, title, price, city, neighbourhood, road, square_meters, floor)
 SELECT url, title, price, city, neighbourhood, road, square_meters, floor
-FROM properties.properties
+FROM main.properties
 WHERE NOT EXISTS (  
     SELECT 1 
-    FROM properties.cleaned_properties
-    WHERE properties.cleaned_properties.url = properties.properties.url
+    FROM main.cleaned_properties
+    WHERE main.cleaned_properties.url = main.properties.url
 )
 """
     con.sql(insert_query_only_new)
+    print("Cleaning properties 3")
     con.sql(insert_query)
- 
-    con.sql("DELETE FROM properties.properties;")
-
+    print("Cleaning properties 4")
+    con.sql("DELETE FROM main.properties;")
+    print("Cleaning properties 5")
 
 if __name__ == "__main__":
+    print("Scraping properties")
     scrape_properties()
-    clean_properties()
+    print("Cleaning properties")
+
+  #  con = duckdb.connect("md:adriano_warehouse")
+
+   # clean_properties(con)
     
