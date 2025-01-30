@@ -23,7 +23,7 @@ def main() -> None:
 
     polars_df: pl.DataFrame = pl.DataFrame(data)
 
-    con: duckdb.DuckDBPyConnection = duckdb.connect(f"md:{warehouse_name}?motherduck_token={motherduck_token}")
+    con = duckdb.connect(f"md:{warehouse_name}?motherduck_token={motherduck_token}")
     
     con.sql("create table if not exists main.properties as select * from polars_df")
 
