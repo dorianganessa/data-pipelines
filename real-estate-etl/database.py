@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS main.cleaned_properties (
     neighbourhood TEXT,
     road TEXT,
     square_meters INTEGER,
-    floor TEXT
+    floor TEXT,
+    garage_info TEXT
 );
 CREATE OR REPLACE TABLE main.new_properties (
     url TEXT PRIMARY KEY,
@@ -24,13 +25,14 @@ CREATE OR REPLACE TABLE main.new_properties (
     neighbourhood TEXT,
     road TEXT,
     square_meters INTEGER,
-    floor TEXT
+    floor TEXT,
+    garage_info TEXT
 );
 """
     con.sql(create_table_query)
     insert_query = """
-INSERT INTO main.cleaned_properties (url, title, price, city, neighbourhood, road, square_meters, floor)
-SELECT url, title, price, city, neighbourhood, road, square_meters, floor
+INSERT INTO main.cleaned_properties (url, title, price, city, neighbourhood, road, square_meters, floor, garage_info)
+SELECT url, title, price, city, neighbourhood, road, square_meters, floor, garage_info
 FROM main.properties
 WHERE NOT EXISTS (  
     SELECT 1 
@@ -39,8 +41,8 @@ WHERE NOT EXISTS (
 );
 """
     insert_query_only_new = """
-INSERT INTO main.new_properties (url, title, price, city, neighbourhood, road, square_meters, floor)
-SELECT url, title, price, city, neighbourhood, road, square_meters, floor
+INSERT INTO main.new_properties (url, title, price, city, neighbourhood, road, square_meters, floor, garage_info)
+SELECT url, title, price, city, neighbourhood, road, square_meters, floor, garage_info
 FROM main.properties
 WHERE NOT EXISTS (  
     SELECT 1 

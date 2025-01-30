@@ -29,6 +29,16 @@ def parse_page(url):
         
         floor_match = re.search(r'Piano\s(\d+)', soup.text)
         floor = int(floor_match.group(1)) if floor_match else None
+
+                # Find the feature item related to parking/garage
+        garage_feature = listing.find('dt', class_='re-featuresItem__title', string="Box, posti auto")
+
+        if garage_feature:
+            # Get the associated description (dd)
+            garage_description = garage_feature.find_next('dd', class_='re-featuresItem__description')
+            garage_info = garage_description.get_text(strip=True) if garage_description else None
+        else:
+            garage_info = None
         
         data = {
             "url": url,
@@ -40,6 +50,7 @@ def parse_page(url):
             "road": road.text.strip() if road else None,
             "square_meters": square_meters,
             "floor": floor,
+            "garage_info": garage_info,
         }
         
     return data

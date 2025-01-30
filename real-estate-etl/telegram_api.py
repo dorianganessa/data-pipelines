@@ -1,11 +1,15 @@
 import telegram
 import os
 
+from dotenv import load_dotenv
 
-TELEGRAM_BOT_API_KEY = os.getenv('telegram_bot_api_key')
+load_dotenv()
+
+telegram_bot_api_key = os.getenv('telegram_bot_api_key')
 chat_id = os.getenv('chat_id')
 chat_tag = os.getenv('chat_tag')
-bot = telegram.Bot(TELEGRAM_BOT_API_KEY)
+
+bot = telegram.Bot(telegram_bot_api_key)
 
 
 # Function to format the message

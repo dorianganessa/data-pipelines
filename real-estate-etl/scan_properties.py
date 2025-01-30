@@ -1,7 +1,4 @@
-import requests
 from bs4 import BeautifulSoup
-import re
-import logging
 import polars
 import duckdb
 from scraper import parse_listing
