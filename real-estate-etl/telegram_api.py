@@ -2,9 +2,9 @@ import telegram
 
 
 
-TELEGRAM_BOT_API_KEY = '6596026864:AAFkT1-yG7abTakVEgGeqfiNyA-2mE3dO20'
-chat_id = '-4799482591'
-chat_tag = '@affittinapoliadriano'
+TELEGRAM_BOT_API_KEY = os.getenv('TELEGRAM_BOT_API_KEY')
+chat_id = os.getenv('CHAT_ID')
+chat_tag = os.getenv('CHAT_TAG')
 bot = telegram.Bot(TELEGRAM_BOT_API_KEY)
 
 
