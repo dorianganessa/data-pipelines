@@ -54,5 +54,5 @@ WHERE NOT EXISTS (
 
 
 def get_new_properties(con) -> None:
-    df = con.sql("SELECT * FROM main.cleaned_properties;").pl()
+    df = con.sql("SELECT * FROM main.new_properties;").pl()
     return df
