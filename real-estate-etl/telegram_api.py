@@ -1,5 +1,5 @@
 import telegram
-
+import os
 
 
 TELEGRAM_BOT_API_KEY = os.getenv('TELEGRAM_BOT_API_KEY')
