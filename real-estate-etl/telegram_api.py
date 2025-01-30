@@ -2,9 +2,9 @@ import telegram
 import os
 
 
-TELEGRAM_BOT_API_KEY = os.getenv('TELEGRAM_BOT_API_KEY')
-chat_id = os.getenv('CHAT_ID')
-chat_tag = os.getenv('CHAT_TAG')
+TELEGRAM_BOT_API_KEY = os.getenv('telegram_bot_api_key')
+chat_id = os.getenv('chat_id')
+chat_tag = os.getenv('chat_tag')
 bot = telegram.Bot(TELEGRAM_BOT_API_KEY)
 
 
