@@ -51,3 +51,8 @@ WHERE NOT EXISTS (
     con.sql(insert_query_only_new)
     con.sql(insert_query)
     con.sql("DELETE FROM main.properties;")
+
+
+def get_new_properties(con) -> None:
+    df = con.sql("SELECT * FROM main.cleaned_properties;").pl()
+    return df
