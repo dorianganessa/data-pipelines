@@ -1,19 +1,25 @@
 import telegram
 import os
-
+from typing import Dict, Any
 from dotenv import load_dotenv
 
 load_dotenv()
 
-telegram_bot_api_key = os.getenv('telegram_bot_api_key')
+TELEGRAM_BOT_API_KEY: str = os.getenv("telegram_bot_api_key")
+
+if TELEGRAM_BOT_API_KEY is None:
+    raise ValueError("TELEGRAM_BOT_API_KEY is not set. Please check your environment variables.")
+
+bot: telegram.Bot = telegram.Bot(TELEGRAM_BOT_API_KEY)
+
 chat_id = os.getenv('chat_id')
 chat_tag = os.getenv('chat_tag')
 
-bot = telegram.Bot(telegram_bot_api_key)
 
 
 # Function to format the message
-def format_property_message(row):
+def format_property_message(row: Dict[str, Any]) -> str:
+    """Format a property message for sending via Telegram."""
     return (
         f"🏠 **{row['title']}**\n"
         f"📍 Location: {row['city']}, {row['neighbourhood']}, {row['road']}\n"
@@ -25,7 +31,9 @@ def format_property_message(row):
     )
 
 
-def send_message(message):
-
+def send_message(message: str) -> None:
+    """Send a message using the Telegram bot."""
+    if chat_id is None:
+        raise ValueError("TELEGRAM_CHAT_ID is not set. Please check your environment variables.")
     bot.sendMessage(chat_id=chat_id, text=message, parse_mode=telegram.ParseMode.MARKDOWN)
 

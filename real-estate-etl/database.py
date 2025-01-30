@@ -1,7 +1,8 @@
 import logging
+import polars as pl
+import duckdb
 
-
-def clean_properties(con) -> None:
+def clean_properties(con: duckdb.DuckDBPyConnection) -> None:
     logging.debug("Starting property cleaning")
     create_table_query = """
 CREATE TABLE IF NOT EXISTS main.cleaned_properties (
@@ -55,6 +56,6 @@ WHERE NOT EXISTS (
     con.sql("DELETE FROM main.properties;")
 
 
-def get_new_properties(con) -> None:
+def get_new_properties(con: duckdb.DuckDBPyConnection) -> pl.DataFrame:
     df = con.sql("SELECT * FROM main.new_properties;").pl()
     return df

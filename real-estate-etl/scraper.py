@@ -2,15 +2,16 @@ import re
 import logging
 import requests
 from bs4 import BeautifulSoup
+from typing import Optional, Dict, List
 
 
-def parse_price(price_raw):
+def parse_price(price_raw: Optional[str]) -> Optional[int]:
     if not price_raw:
         return None
     price_cleaned = re.sub(r'[^\d]', '', price_raw)
     return int(price_cleaned) if price_cleaned else None
 
-def parse_page(url):
+def parse_page(url: str) -> Dict[str, Optional[any]]:
     logging.debug("Parsing page: %s", url)
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -30,7 +31,7 @@ def parse_page(url):
         floor_match = re.search(r'Piano\s(\d+)', soup.text)
         floor = int(floor_match.group(1)) if floor_match else None
 
-                # Find the feature item related to parking/garage
+        # Find the feature item related to parking/garage
         garage_feature = listing.find('dt', class_='re-featuresItem__title', string="Box, posti auto")
 
         if garage_feature:
@@ -55,7 +56,7 @@ def parse_page(url):
         
     return data
 
-def parse_listing(url):
+def parse_listing(url: str) -> List[Dict[str, Optional[any]]]:
     logging.debug("Fetching main listing page: %s", url)
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
