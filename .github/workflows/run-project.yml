@@ -23,7 +23,9 @@ jobs:
         run: uv venv .venv
 
       - name: Install Dependencies
-        run: uv lock
+        run: |
+          cd real-estate-etl
+          uv lock
 
       - name: Create .env File
         run: |
