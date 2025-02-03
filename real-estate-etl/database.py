@@ -14,7 +14,8 @@ def create_properties_table(con: duckdb.DuckDBPyConnection) -> None:
             road VARCHAR,
             square_meters BIGINT,
             floor BIGINT,
-            garage_info VARCHAR
+            garage_info VARCHAR,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
