@@ -33,7 +33,7 @@ if __name__ == "__main__":
     insert_new_properties(con)
 
     # Iterate over the DataFrame and format each property
-    if new_rows_df is not None:
+    if new_rows_df is not None and not new_rows_df.is_empty():
         messages: list[str] = [format_property_message(row) for row in new_rows_df.iter_rows(named=True)]
     else:
         messages = []

@@ -28,6 +28,7 @@ def get_new_properties(con: duckdb.DuckDBPyConnection) -> pl.DataFrame:
         LEFT JOIN main.properties p ON nd.url = p.url
         WHERE p.url IS NULL
     """).pl()
+    return new_rows_df
 
 
 def insert_new_properties(con: duckdb.DuckDBPyConnection) -> None:
