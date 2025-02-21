@@ -49,6 +49,8 @@ jobs:
           uv run scan_properties.py
 
       - name: Run SQLMesh
+        env:
+          motherduck_token: ${{ secrets.motherduck_token }}
         run: |
           cd real-estate-sqlmesh
           uv run sqlmesh plan
