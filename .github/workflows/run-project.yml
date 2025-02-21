@@ -53,4 +53,5 @@ jobs:
           motherduck_token: ${{ secrets.motherduck_token }}
         run: |
           cd real-estate-sqlmesh
+          uv lock
           uv run sqlmesh plan
