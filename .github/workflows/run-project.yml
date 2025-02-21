@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: "0 */3 * * *"
 
 jobs:
   run-python:
@@ -47,3 +47,9 @@ jobs:
         run: |
           cd real-estate-etl
           uv run scan_properties.py
+
+      - name: Run SQLMesh
+        run: |
+          cd real-estate-sqlmesh
+          uv run sqlmesh plan
+          uv run sqlmesh apply
