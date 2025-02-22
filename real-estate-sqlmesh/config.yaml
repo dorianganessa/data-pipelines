@@ -3,7 +3,7 @@ gateways:
     connection:
       type: motherduck
       database: adriano_warehouse
-      token: { { env_var('motherduck_token') } }
+      token: {{ env_var('MOTHERDUCK_TOKEN') }}
 
 default_gateway: local
 
