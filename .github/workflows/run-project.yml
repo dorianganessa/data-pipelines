@@ -55,3 +55,4 @@ jobs:
           cd real-estate-sqlmesh
           uv lock
           uv run sqlmesh plan
+          uv run sqlmesh run
