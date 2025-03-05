@@ -4,7 +4,6 @@ MODEL (
     time_column (created_at, '%Y-%m-%d %H:%M:%S.%f')
   ),
   start '2020-01-01',
-  cron '@daily',
   grain (url)
 );
 
