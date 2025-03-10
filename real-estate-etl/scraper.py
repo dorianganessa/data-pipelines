@@ -12,12 +12,23 @@ def parse_price(price_raw: Optional[str]) -> Optional[int]:
     return int(price_cleaned) if price_cleaned else None
 
 def parse_page(url: str) -> Dict[str, Optional[any]]:
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'none',
+        'Sec-Fetch-User': '?1',
+    }
     logging.debug("Parsing page: %s", url)
-    response = requests.get(url)
+    response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.text, 'html.parser')
     
     listings = soup.select('section.re-layoutContentCenter')
-    
     for listing in listings:
         city = listing.select_one('div.re-title__content span.re-blockTitle__location')
         neighbourhood = listing.select_one('div.re-title__content span.re-blockTitle__location:nth-of-type(2)')
@@ -53,12 +64,23 @@ def parse_page(url: str) -> Dict[str, Optional[any]]:
             "floor": floor,
             "garage_info": garage_info,
         }
-        
     return data
 
 def parse_listing(url: str) -> List[Dict[str, Optional[any]]]:
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'none',
+        'Sec-Fetch-User': '?1',
+    }
     logging.debug("Fetching main listing page: %s", url)
-    response = requests.get(url)
+    response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.text, 'html.parser')
     data_list = []
     links = soup.select('a.in-listingCardTitle')

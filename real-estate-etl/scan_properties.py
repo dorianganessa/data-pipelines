@@ -24,7 +24,6 @@ if __name__ == "__main__":
     con: duckdb.DuckDBPyConnection = duckdb.connect(f"md:{warehouse_name}?motherduck_token={motherduck_token}")
 
     create_properties_table(con)
-    
     con.register("new_data", polars_df)
 
     new_rows_df: pl.DataFrame = get_new_properties(con)
