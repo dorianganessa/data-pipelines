@@ -127,6 +127,7 @@ def parse_listing(url: str) -> List[Dict[str, Optional[any]]]:
     }
     logging.debug("Fetching main listing page: %s", url)
     response = requests.get(url, headers=headers)
+    print(response.text)
     soup = BeautifulSoup(response.text, 'html.parser')
     data_list = []
     links = soup.select('a.in-listingCardTitle')
