@@ -36,6 +36,7 @@ jobs:
           echo "telegram_bot_api_key=${{ secrets.telegram_bot_api_key }}" >> .env
           echo "chat_id=${{ secrets.chat_id }}" >> .env
           echo "chat_tag=${{ secrets.chat_tag }}" >> .env
+          echo "proxy_url=${{ secrets.proxy_url }}" >> .env
       - name: Run Python Script
         env:
           warehouse_name: ${{ secrets.warehouse_name }}
@@ -44,6 +45,7 @@ jobs:
           telegram_bot_api_key: ${{ secrets.telegram_bot_api_key }}
           chat_id: ${{ secrets.chat_id }}
           chat_tag: ${{ secrets.chat_tag }}
+          proxy_url: ${{ secrets.proxy_url }}
         run: |
           cd real-estate-etl
           uv run scan_properties.py
