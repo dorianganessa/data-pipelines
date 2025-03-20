@@ -14,25 +14,12 @@ def parse_price(price_str):
     price_match = re.search(r'\d+[.,]?\d*', price_str.replace('\u20ac', '').replace('.', '').replace(',', '.'))
     return int(price_match.group(0).split('.')[0]) if price_match else None
 
-
-
-def parse_page(url: str) -> Dict[str, Optional[any]]:
-    logging.debug("Parsing page: %s", url)
-
+def get_opener():
     proxy_url = os.getenv('proxy_url')
-    
-    # Create a context that doesn't verify certificates
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
-    
-    opener = urllib.request.build_opener(
-        urllib.request.ProxyHandler({
-            'http': proxy_url,
-            'https': proxy_url
-        }),
-        urllib.request.HTTPSHandler(context=ctx)  # Add the SSL context
-    )
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({'http': proxy_url, 'https': proxy_url}), urllib.request.HTTPSHandler(context=ctx))
     opener.addheaders = [
         ('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'),
         ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8'),
@@ -45,15 +32,23 @@ def parse_page(url: str) -> Dict[str, Optional[any]]:
         ('Sec-Fetch-Site', 'none'),
         ('Sec-Fetch-User', '?1'),
     ]
-    
+    return opener
+
+def get_html_content(url: str) -> str:
+    opener = get_opener()
     response = opener.open(url)
-    
-    # Check if response is gzipped
     if response.info().get('Content-Encoding') == 'gzip':
         import gzip
         html_content = gzip.decompress(response.read()).decode('utf-8', errors='replace')
     else:
         html_content = response.read().decode('utf-8', errors='replace')
+    return html_content
+
+
+def parse_page(url: str) -> Dict[str, Optional[any]]:
+    logging.debug("Parsing page: %s", url)
+    
+    html_content = get_html_content(url)
     
     soup = BeautifulSoup(html_content, 'html.parser')
     
@@ -113,22 +108,9 @@ def parse_page(url: str) -> Dict[str, Optional[any]]:
    
 
 def parse_listing(url: str) -> List[Dict[str, Optional[any]]]:
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'none',
-        'Sec-Fetch-User': '?1',
-    }
     logging.debug("Fetching main listing page: %s", url)
-    response = requests.get(url, headers=headers)
-    print(response.text)
-    soup = BeautifulSoup(response.text, 'html.parser')
+    html_content = get_html_content(url)
+    soup = BeautifulSoup(html_content, 'html.parser')
     data_list = []
     links = soup.select('a.in-listingCardTitle')
     for link in links:
