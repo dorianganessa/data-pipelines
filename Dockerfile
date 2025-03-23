@@ -16,4 +16,4 @@ RUN apt-get update && apt-get install -y \
 RUN uv --directory real-estate-etl sync --frozen
 RUN uv --directory real-estate-sqlmesh sync --frozen
 
-ENTRYPOINT ["uv","run"]
+ENTRYPOINT ["uv"]
