@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-RUN uv sync --frozen
+
+
+RUN uv --directory real-estate-etl sync --frozen
+RUN uv --directory real-estate-sqlmesh sync --frozen
 
 ENTRYPOINT ["uv","run"]
