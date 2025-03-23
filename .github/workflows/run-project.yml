@@ -1,58 +1,44 @@
-name: Run Python Project with UV
+name: Build and Push Docker Image
 
 on:
   push:
     branches:
       - main
-  schedule:
-    - cron: "0 */3 * * *"
 
 jobs:
-  run-python:
+  docker-build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install UV
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Set up Python Environment with UV
-        run: uv venv .venv
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Dependencies
-        run: |
-          cd real-estate-etl
-          uv lock
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=sha,format=short
+            type=raw,value=latest
 
-      - name: Create .env File
-        run: |
-          echo "warehouse_name=${{ secrets.warehouse_name }}" > .env
-          echo "motherduck_token=${{ secrets.motherduck_token }}" >> .env
-          echo "scrape_url=${{ secrets.scrape_url }}" >> .env
-          echo "telegram_bot_api_key=${{ secrets.telegram_bot_api_key }}" >> .env
-          echo "chat_id=${{ secrets.chat_id }}" >> .env
-          echo "chat_tag=${{ secrets.chat_tag }}" >> .env
-      - name: Run Python Script
-        env:
-          warehouse_name: ${{ secrets.warehouse_name }}
-          motherduck_token: ${{ secrets.motherduck_token }}
-          scrape_url: ${{ secrets.scrape_url }}
-          telegram_bot_api_key: ${{ secrets.telegram_bot_api_key }}
-          chat_id: ${{ secrets.chat_id }}
-          chat_tag: ${{ secrets.chat_tag }}
-        run: |
-          cd real-estate-etl
-          uv run scan_properties.py
-
-      - name: Run SQLMesh
-        env:
-          motherduck_token: ${{ secrets.motherduck_token }}
-        run: |
-          cd real-estate-sqlmesh
-          uv lock
-          uv run sqlmesh plan
-          uv run sqlmesh run
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
