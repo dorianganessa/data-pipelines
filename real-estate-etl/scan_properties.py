@@ -12,7 +12,7 @@ from telegram_api import send_message, format_property_message
 if __name__ == "__main__":
 
 
-    load_dotenv()
+    load_dotenv("../.env")
 
     url: str = os.getenv("scrape_url")
     warehouse_name: str = os.getenv("warehouse_name")
