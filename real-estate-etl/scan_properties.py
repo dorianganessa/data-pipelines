@@ -7,12 +7,18 @@ from dotenv import load_dotenv
 import os
 from telegram_api import send_message, format_property_message
 
+def load_env_file():
+    if os.path.exists("../.env"):
+        load_dotenv("../.env")
+    elif os.path.exists("../files/.env"):
+        load_dotenv("../files/.env")
+    else:
+        print("Warning: No .env file found in ../.env or ../files/.env")
 
+load_env_file()
 
 if __name__ == "__main__":
 
-
-    load_dotenv("../.env")
 
     url: str = os.getenv("scrape_url")
     warehouse_name: str = os.getenv("warehouse_name")
