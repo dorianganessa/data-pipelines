@@ -3,15 +3,7 @@ import os
 from typing import Dict, Any
 from dotenv import load_dotenv
 
-def load_env_file():
-    if os.path.exists("../.env"):
-        load_dotenv("../.env")
-    elif os.path.exists("../files/.env"):
-        load_dotenv("../files/.env")
-    else:
-        print("Warning: No .env file found in ../.env or ../files/.env")
-
-load_env_file()
+load_dotenv()
 
 TELEGRAM_BOT_API_KEY: str = os.getenv("telegram_bot_api_key")
 
