@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: real_estate
+    schema: main
+    tables:
+      - name: properties
+        description: "A table of properties"

@@ -706,7 +706,7 @@ wheels = [
 ]
 
 [[package]]
-name = "real-estate-sqlmesh"
+name = "real-estate-dbt"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

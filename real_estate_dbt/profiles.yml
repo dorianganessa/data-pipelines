@@ -1,0 +1,10 @@
+real_estate_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      schema: main
+      path: "md:adriano_warehouse?motherduck_token={{ env_var('motherduck_token') }}"
+      threads: 4
+      extensions:
+        - httpfs

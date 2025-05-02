@@ -1,7 +1,0 @@
-real_estate_dbt:
-  target: dev
-  outputs:
-    dev:
-      type: motherduck
-      database: adriano_warehouse
-      token: "{{ env_var('motherduck_token') }}"
