@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: cleaned_properties
+    description: "A cleaned properties table with incremental updates"
+    columns:
+      - name: url
+        description: "The unique URL for the property"
+        tests:
+          - unique
+          - not_null
+      - name: created_at
+        description: "The timestamp when the property was created"
+      - name: price
+        description: "The price of the property"
